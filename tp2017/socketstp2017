@@ -1,0 +1,36 @@
+int main() {
+  logger = log_create("console.log", "CONSOLE	 ", 1/* showLogInConsole */, LOG_LEVEL_INFO);
+  consoleConfig = readFileConfig("config");
+  procesos = list_create();
+
+  // CHECKPOINT 1
+  // logueo por pantalla config
+  printf("Configuracion leida:\n");
+  printf("PUERTO_KERNEL: %d\n", consoleConfig->PUERTO_KERNEL);
+	printf("IP_KERNEL: %s\n", consoleConfig->IP_KERNEL);
+
+
+	// CHECKPOINT 1
+	// conectarse al kernel y manejar un handshake
+	kernelSocket = connectKernel(consoleConfig);
+	if (kernelSocket == -1) {
+		log_error(logger, "No me pude conectar con el kernel.");
+		return EXIT_FAILURE;
+	}
+
+  loadCommands();   //usamos lista de comandos que maneja la consola
+
+
+	char *buffer;
+	size_t bufsize = 1024;
+	buffer = (char *)malloc(bufsize * sizeof(char));
+	while(1) {
+		printf(ANSI_COLOR_BLUE "Nitesteamos@"ANSI_COLOR_MAGENTA"ESTheR"ANSI_COLOR_CYAN" ~ $ " ANSI_COLOR_RESET); //colores
+		getline(&buffer, &bufsize, stdin);
+		executeCommand(buffer);
+	}
+	free(buffer);
+
+
+	return EXIT_SUCCESS;
+}
